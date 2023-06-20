@@ -8,4 +8,3 @@
 - 將專案檔內 /sqlite/db.db 放置於 app service /wwwroot/sqlite/db.db
 - 編輯專案檔內 appsettings.json 變更 DefaultConnection 位置指向 /wwwroot/sqlite/db.db
 - 使用 azure plugin for vs2022 打包上傳 app service
-- 
