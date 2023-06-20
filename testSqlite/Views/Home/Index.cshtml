@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<style>
+    table{
+        width: fit-content;
+    }
+    table, th, td {
+        border: 1px solid black;
+    }
+</style>
+
+<div class="text-center">
+    <h1 class="display-4">Test Sqlite File Mode</h1>
+
+    <h3>請輸入會員資料</h3>
+    <form method="post" action="/Home/AddMember" >
+        姓名: <input name="username"  />
+        電名:  <input name="usertel" />
+        <input type="submit"/>
+    </form>
+
+    <br /><br /><br />
+    <h3>會員清單</h3>
+    <table border="1"   >
+
+        @foreach (var member in ViewBag.Members)
+        {
+               <tr>
+            <td> @member.username  </td>
+            <td> @member.usertel  </td>
+
+        </tr>
+        }
+
+     
+
+    </table>
+</div>
