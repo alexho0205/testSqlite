@@ -1,18 +1,19 @@
 ﻿using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Configuration;
-using System.Diagnostics.Metrics;
 using testSqlite.DBModels;
+using Dapper;
 
 namespace testSqlite.Services
 {
     public class MemberService
     {
+        private readonly ILogger<MemberService> _logger;
         private readonly IConfiguration _configuration;
         //private string _connectionString = "Data Source=db.db;";
 
-        public MemberService(IConfiguration configuration)
+        public MemberService(IConfiguration configuration, ILogger<MemberService> logger)
         {
             _configuration = configuration;
+            _logger = logger;
         }
 
 
@@ -26,17 +27,17 @@ namespace testSqlite.Services
         internal void add(Member member)
         {
             
-            using (var connection = getConnection())
+            using (SqliteConnection conn = getConnection())
             {
-                connection.Open();
-                var command = connection.CreateCommand();
-                command.CommandText =
-                    @"  INSERT INTO users (user_name, user_tel)
-                values ($userName , $userTel);
-                select last_insert_rowid();";
-                command.Parameters.AddWithValue("$userName", member.username);
-                command.Parameters.AddWithValue("$userTel", member.usertel);
-                int id = Convert.ToInt32((object)command.ExecuteScalar());
+               
+               
+
+                string insertSQL = @"  INSERT INTO users (username, usertel)
+                values ($userName , $userTel);";
+                var p = new DynamicParameters();
+                p.Add("$userName", member.username);
+                p.Add("$userTel", member.usertel);
+                conn.Execute(insertSQL,p);
             }
         }
 
@@ -44,26 +45,22 @@ namespace testSqlite.Services
         {
             List<Member> members = new List<Member>();
 
-            using (var connection = getConnection())
+
+
+            using (SqliteConnection conn = getConnection())
             {
-                connection.Open();
-                var command = connection.CreateCommand();
-                command.CommandText = @"  select user_name , user_tel from users";
 
-                using (var reader = command.ExecuteReader())
+                try
                 {
-                    while (reader.Read())
-                    {
-                        string userName = reader.GetString(0);
-                        string userTel = reader.GetString(1);
-
-                       Member memeber = new Member() { 
-                           username = userName,
-                           usertel = userTel
-                       };
-                        members.Add(memeber);
-                    }
+                    members = conn.Query<Member>(" select username , usertel from users").ToList();
+                }  catch (Exception e)
+                {
+                    _logger.LogError(e.ToString());
                 }
+
+              
+
+          
             }
             return members;
         }

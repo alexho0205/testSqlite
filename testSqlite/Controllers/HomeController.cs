@@ -10,16 +10,28 @@ namespace testSqlite.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly MemberService _memberService;
+ 
 
-        public HomeController(ILogger<HomeController> logger , MemberService memberService )
+        public HomeController( MemberService memberService , ILogger<HomeController> logger)
         {
-            _logger = logger;
             _memberService = memberService;
+            _logger = logger;
         }
 
         public IActionResult Index()
         {
-            List<Member> members = this._memberService.GetAllMembers();
+            List<Member> members = new List<Member>();
+            _logger.LogInformation("index page : show all users.");
+            try
+            {
+                //List<Member> members = new List<Member>();
+               members = this._memberService.GetAllMembers();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+            }
+            
             ViewBag.Members = members;
             return View();
         }
@@ -29,6 +41,7 @@ namespace testSqlite.Controllers
         [HttpPost]
         public IActionResult AddMember(Member member)
         {
+            _logger.LogInformation("AddMember");
             this._memberService.add(member);
             return RedirectToAction("Index");
         }
