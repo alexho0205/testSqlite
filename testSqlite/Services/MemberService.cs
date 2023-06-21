@@ -29,8 +29,6 @@ namespace testSqlite.Services
             
             using (SqliteConnection conn = getConnection())
             {
-               
-               
 
                 string insertSQL = @"  INSERT INTO users (username, usertel)
                 values ($userName , $userTel);";
